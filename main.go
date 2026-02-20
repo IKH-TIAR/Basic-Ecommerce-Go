@@ -33,7 +33,10 @@ func getProductsHandler(w http.ResponseWriter, r *http.Request) {
 
 	encoder := json.NewEncoder(w)
 
-	encoder.Encode(productlist)
+	if err := encoder.Encode(productlist); err != nil {
+		http.Error(w, "Error encoding JSON", 500)
+		return
+	}
 }
 
 func main() {
@@ -69,7 +72,11 @@ func init() {
 		Description: "This is a banana, we don't like to eat banana",
 		Price:       45.44,
 	}
-	productlist = append(productlist, prd1)
-	productlist = append(productlist, prd2)
-	productlist = append(productlist, prd3)
+	prd4 := Product{
+		ID:          4,
+		Title:       "Not banana",
+		Description: "This is a not banana, we don't like to eat not banana",
+		Price:       45.44,
+	}
+	productlist = append(productlist, prd1, prd2, prd3, prd4)
 }
