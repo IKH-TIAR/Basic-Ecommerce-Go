@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strings"
 )
 
 func testHandler(w http.ResponseWriter, r *http.Request) {
@@ -39,16 +40,64 @@ func getProductsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func createProduc(w http.ResponseWriter, r *http.Request){
+
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+	w.Header().Set("Content-Type", "application/json")
+
+	if r.Method == http.MethodOptions{
+		w.WriteHeader(http.StatusOK)
+		return
+	}
+
+	if r.Method != http.MethodPost {
+		http.Error(w, "Please Give Post Request", 400)
+		return
+	}
+
+	var newProduct Product
+
+	decoder := json.NewDecoder(r.Body)
+
+	if err := decoder.Decode(&newProduct); err != nil {
+		http.Error(w, "Please Provide a valid json", http.StatusBadRequest)
+		log.Println(err)
+		return
+	}
+
+	if strings.TrimSpace(newProduct.Description) == "" || newProduct.Price < 0.00 || strings.TrimSpace(newProduct.Title) == "" {
+		http.Error(w, "Fields Cannot be Empty", http.StatusBadRequest)
+		return
+	}
+
+	newProduct.ID = len(productlist) + 1
+
+	productlist = append(productlist, newProduct)
+
+	encoder := json.NewEncoder(w)
+
+	if err := encoder.Encode(newProduct); err != nil {
+		http.Error(w, "Error Encoding", http.StatusInternalServerError)
+		return
+	}
+
+
+
+}
+
 func main() {
-	mux := http.NewServeMux()
+	mux := http.NewServeMux() // Router
 
-	mux.HandleFunc("/", testHandler)
+	mux.HandleFunc("/", testHandler) // Route
 
-	mux.HandleFunc("/products", getProductsHandler)
+	mux.HandleFunc("/products", getProductsHandler) // Route get products
+
+	mux.HandleFunc("/create", createProduc) // Route to create products
 
 	log.Println("Starting server on :9090")
 
-	log.Fatal(http.ListenAndServe(":9090", mux))
+	log.Fatal(http.ListenAndServe(":9090", mux)) 
 
 }
 
