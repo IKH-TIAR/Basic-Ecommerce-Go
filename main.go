@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -18,6 +19,15 @@ type Product struct {
 	Title       string  `json:"title"`
 	Description string  `json:"description"`
 	Price       float64 `json:"price"`
+}
+
+func (p Product) validate() error {
+
+	if strings.TrimSpace(p.Description) == "" || p.Price < 0.00 || strings.TrimSpace(p.Title) == "" {
+		return errors.New("Fields Can Not Be Empty")
+	}
+
+	return nil
 }
 
 var productlist []Product
@@ -40,13 +50,13 @@ func getProductsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func createProduc(w http.ResponseWriter, r *http.Request){
+func createProduc(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
 	w.Header().Set("Content-Type", "application/json")
 
-	if r.Method == http.MethodOptions{
+	if r.Method == http.MethodOptions {
 		w.WriteHeader(http.StatusOK)
 		return
 	}
@@ -62,12 +72,12 @@ func createProduc(w http.ResponseWriter, r *http.Request){
 
 	if err := decoder.Decode(&newProduct); err != nil {
 		http.Error(w, "Please Provide a valid json", http.StatusBadRequest)
-		log.Println(err)
 		return
 	}
 
-	if strings.TrimSpace(newProduct.Description) == "" || newProduct.Price < 0.00 || strings.TrimSpace(newProduct.Title) == "" {
-		http.Error(w, "Fields Cannot be Empty", http.StatusBadRequest)
+	// validate
+	if err := newProduct.validate(); err!=nil{
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
@@ -82,8 +92,6 @@ func createProduc(w http.ResponseWriter, r *http.Request){
 		return
 	}
 
-
-
 }
 
 func main() {
@@ -97,7 +105,7 @@ func main() {
 
 	log.Println("Starting server on :9090")
 
-	log.Fatal(http.ListenAndServe(":9090", mux)) 
+	log.Fatal(http.ListenAndServe(":9090", mux))
 
 }
 
