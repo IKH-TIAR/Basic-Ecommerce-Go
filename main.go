@@ -37,10 +37,10 @@ func getProductsHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Content-Type", "application/json")
 
-	if r.Method != http.MethodGet {
-		http.Error(w, "Please Give a valid Request Method", 404)
-		return
-	}
+	// if r.Method != http.MethodGet {
+	// 	http.Error(w, "Please Give a valid Request Method", 404)
+	// 	return
+	// }
 
 	encoder := json.NewEncoder(w)
 
@@ -97,11 +97,11 @@ func createProduc(w http.ResponseWriter, r *http.Request) {
 func main() {
 	mux := http.NewServeMux() // Router
 
-	mux.HandleFunc("/", testHandler) // Route
+	mux.Handle("/", http.HandlerFunc(testHandler)) // Route
 
-	mux.HandleFunc("/products", getProductsHandler) // Route get products
+	mux.Handle("GET /products", http.HandlerFunc(getProductsHandler)) // Route get products
 
-	mux.HandleFunc("/create", createProduc) // Route to create products
+	mux.Handle("POST /create", http.HandlerFunc(createProduc)) // Route to create products
 
 	log.Println("Starting server on :9090")
 
