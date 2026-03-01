@@ -12,8 +12,10 @@ func StartServer() {
 
 	mux.Handle("GET /products", http.HandlerFunc(handlers.GetProductsHandler)) // Route get products
 
-	mux.Handle("POST /create", http.HandlerFunc(handlers.CreateProduct)) // Route to create products
+	mux.Handle("POST /products", http.HandlerFunc(handlers.CreateProduct)) // Route to create products
 
+	mux.Handle("GET /products/{id}", http.HandlerFunc(handlers.GetProductByID)) // Route to get a product by ID
+	
 	log.Println("Starting server on :9090")
 
 	log.Fatal(http.ListenAndServe(":9090", middleware.CorsMiddleware(mux)))
