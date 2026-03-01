@@ -34,37 +34,47 @@ var productlist []Product
 
 func getProductsHandler(w http.ResponseWriter, r *http.Request) {
 
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Content-Type", "application/json")
+	// w.Header().Set("Access-Control-Allow-Origin", "*")
+	// w.Header().Set("Content-Type", "application/json")
 
 	// if r.Method != http.MethodGet {
 	// 	http.Error(w, "Please Give a valid Request Method", 404)
 	// 	return
 	// }
 
-	encoder := json.NewEncoder(w)
+	// encoder := json.NewEncoder(w)
 
-	if err := encoder.Encode(productlist); err != nil {
-		http.Error(w, "Error encoding JSON", 500)
-		return
+	// if err := encoder.Encode(productlist); err != nil {
+	// 	http.Error(w, "Error encoding JSON", 500)
+	// 	return
+	// }
+
+	writeJSON(w, http.StatusOK, productlist)
+}
+
+func writeJSON(w http.ResponseWriter, status int, v any){
+	w.WriteHeader(status)
+
+	if err := json.NewEncoder(w).Encode(v); err != nil {
+		http.Error(w,"erron encoding JSON", http.StatusInternalServerError)
 	}
 }
 
-func createProduc(w http.ResponseWriter, r *http.Request) {
+func createProduct(w http.ResponseWriter, r *http.Request) {
 
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
-	w.Header().Set("Content-Type", "application/json")
+	// w.Header().Set("Access-Control-Allow-Origin", "*")
+	// w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+	// w.Header().Set("Content-Type", "application/json")
 
-	if r.Method == http.MethodOptions {
-		w.WriteHeader(http.StatusOK)
-		return
-	}
+	// if r.Method == http.MethodOptions {
+	// 	w.WriteHeader(http.StatusOK)
+	// 	return
+	// }
 
-	if r.Method != http.MethodPost {
-		http.Error(w, "Please Give Post Request", 400)
-		return
-	}
+	// if r.Method != http.MethodPost {
+	// 	http.Error(w, "Please Give Post Request", 400)
+	// 	return
+	// }
 
 	var newProduct Product
 
@@ -85,13 +95,30 @@ func createProduc(w http.ResponseWriter, r *http.Request) {
 
 	productlist = append(productlist, newProduct)
 
-	encoder := json.NewEncoder(w)
+	// encoder := json.NewEncoder(w)
 
-	if err := encoder.Encode(newProduct); err != nil {
-		http.Error(w, "Error Encoding", http.StatusInternalServerError)
-		return
-	}
+	// if err := encoder.Encode(newProduct); err != nil {
+	// 	http.Error(w, "Error Encoding", http.StatusInternalServerError)
+	// 	return
+	// }
 
+	writeJSON(w, http.StatusCreated, newProduct)
+
+}
+
+func corsMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")    // (3)
+        w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+        w.Header().Set("Content-Type", "application/json")
+
+		if r.Method == http.MethodOptions{
+			w.WriteHeader(http.StatusOK)
+			return 
+		}
+
+		next.ServeHTTP(w, r)
+	})
 }
 
 func main() {
@@ -101,11 +128,11 @@ func main() {
 
 	mux.Handle("GET /products", http.HandlerFunc(getProductsHandler)) // Route get products
 
-	mux.Handle("POST /create", http.HandlerFunc(createProduc)) // Route to create products
+	mux.Handle("POST /create", http.HandlerFunc(createProduct)) // Route to create products
 
 	log.Println("Starting server on :9090")
 
-	log.Fatal(http.ListenAndServe(":9090", mux))
+	log.Fatal(http.ListenAndServe(":9090", corsMiddleware(mux)))
 
 }
 
