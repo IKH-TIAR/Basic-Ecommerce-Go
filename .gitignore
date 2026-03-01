@@ -1,0 +1,15 @@
+# Build output
+tmp/
+*.exe
+*.out
+
+# Environment variables
+.env
+.env.*
+
+# Air live reload config (if generated)
+.air.toml
+
+# OS files
+.DS_Store
+Thumbs.db
