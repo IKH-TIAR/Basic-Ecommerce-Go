@@ -6,9 +6,10 @@ import (
 	"time"
 )
 
-func LoggerMiddleware(next http.Handler) http.Handler {
+func Logger(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		start := time.Now()
+		log.Println("LoggerMiddleware")
 		next.ServeHTTP(w, r)
 		log.Printf("%s %s %s %v", r.RemoteAddr, r.Method, r.URL, time.Since(start))
 	})

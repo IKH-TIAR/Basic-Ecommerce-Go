@@ -1,18 +1,32 @@
 package cmd
 
-	import (
+import (
+	"ecommerce/config"
+	"ecommerce/middleware"
 	"log"
 	"net/http"
-	"ecommerce/middleware"
-
 )
 
 func StartServer() {
+
+	cnf := config.GetConfig()
+
+	manager := middleware.NewManager()
+
+	manager.Use(
+		middleware.Logger,
+		middleware.CorsMiddleware,
+		middleware.PreflightMiddleware,
+	)
 	mux := http.NewServeMux() // Router
 
-	SetupRoutes(mux)
-	
+	wrappedMux := manager.WrappedMux(mux)
+
+	SetupRoutes(mux, manager)
+
+	adr := ":" + cnf.HttpPort
+
 	log.Println("Starting server on :9090")
 
-	log.Fatal(http.ListenAndServe(":9090", middleware.CorsMiddleware(mux)))
+	log.Fatal(http.ListenAndServe(adr, wrappedMux))
 }
