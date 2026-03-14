@@ -2,8 +2,11 @@ package database
 
 import (
 	"errors"
+	"slices"
 	"strings"
 )
+
+var productList []Product
 
 type Product struct {
 	ID          int     `json:"id"`
@@ -12,7 +15,45 @@ type Product struct {
 	Price       float64 `json:"price"`
 }
 
-var ProductList []Product
+
+func Store(p Product) Product {
+	p.ID = len(productList) + 1
+	productList = append(productList, p)
+	return p
+}
+
+func List() []Product {
+	return productList
+}
+
+func Get(id int) *Product {
+	for _, product := range productList{
+		if product.ID == id{
+			return &product
+		}
+	}
+	return nil
+}
+
+func Update(p Product){
+	for idx, product := range productList{
+		if p.ID == product.ID{
+			productList[idx] = p
+		}
+	}
+}
+
+func Delete(id int) string {
+	for idx, product := range productList{
+		if id == product.ID{
+			productList = slices.Delete(productList, idx, idx+1)
+			return "deleted"
+		}
+	}
+
+	return "not_found"
+}
+
 
 func (p Product) Validate() error {
 
@@ -22,6 +63,8 @@ func (p Product) Validate() error {
 
 	return nil
 }
+
+
 
 func init() {
 	prd1 := Product{
@@ -49,6 +92,6 @@ func init() {
 		Description: "This is a not banana, we don't like to eat not banana",
 		Price:       45.44,
 	}
-	ProductList = append(ProductList, prd1, prd2, prd3, prd4)
+	productList = append(productList, prd1, prd2, prd3, prd4)
 	
 }

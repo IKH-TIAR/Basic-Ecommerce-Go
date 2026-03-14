@@ -14,20 +14,18 @@ func CreateProduct(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
 
 	if err := decoder.Decode(&newProduct); err != nil {
-		http.Error(w, "Please Provide a valid json", http.StatusBadRequest)
+		utils.WriteError(w, http.StatusBadRequest, "Please Provide a Valid Json")
 		return
 	}
 
 	// validate
 	if err := newProduct.Validate(); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		utils.WriteError(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	newProduct.ID = len(database.ProductList) + 1
+	createdProduct := database.Store(newProduct)
 
-	database.ProductList = append(database.ProductList, newProduct)
-
-	utils.WriteJSON(w, http.StatusCreated, newProduct)
+	utils.WriteJSON(w, http.StatusCreated, createdProduct)
 
 }

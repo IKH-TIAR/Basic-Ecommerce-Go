@@ -1,8 +1,8 @@
-package cmd
+package rest
 
 import (
-	"ecommerce/handlers"
-	"ecommerce/middleware"
+	"ecommerce/rest/handlers"
+	"ecommerce/rest/middleware"
 	"net/http"
 )
 
@@ -18,6 +18,14 @@ func SetupRoutes(mux *http.ServeMux, manager *middleware.Manager) {
 	)) // Route to create products
 
 	mux.Handle("GET /products/{id}", manager.Chain(
-		http.HandlerFunc(handlers.GetProductByID),
+		http.HandlerFunc(handlers.GetProduct),
 	)) // Route to get a product by ID
+
+	mux.Handle("PUT /products/{id}", manager.Chain(
+		http.HandlerFunc(handlers.Update),
+	)) // Route to update a product by ID
+
+	mux.Handle("DELETE /products/{id}", manager.Chain(
+		http.HandlerFunc(handlers.DeleteProduct),
+	)) // Route to delete product by ID
 }

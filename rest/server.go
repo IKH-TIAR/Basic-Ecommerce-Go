@@ -1,17 +1,15 @@
-package cmd
+package rest
 
 import (
 	"ecommerce/config"
-	"ecommerce/middleware"
+	"ecommerce/rest/middleware"
 	"log"
 	"net/http"
 )
 
-func StartServer() {
+func StartServer(cnf config.Config) {
 
-	cnf := config.GetConfig()
-
-	manager := middleware.NewManager()
+		manager := middleware.NewManager()
 
 	manager.Use(
 		middleware.Logger,
