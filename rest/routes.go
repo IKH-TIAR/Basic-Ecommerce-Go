@@ -29,8 +29,11 @@ func SetupRoutes(mux *http.ServeMux, manager *middleware.Manager) {
 		http.HandlerFunc(handlers.DeleteProduct),
 	)) // Route to delete product by ID
 
-
 	mux.Handle("POST /users", manager.Chain(
 		http.HandlerFunc(handlers.CreateUser),
-	))
+	)) // Route to Register User
+
+	mux.Handle("POST /users/login", manager.Chain(
+		http.HandlerFunc(handlers.Login),
+	)) // Route to Login User
 }

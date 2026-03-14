@@ -18,3 +18,12 @@ func (u User) Store() User {
 	userList = append(userList, u)
 	return u
 }
+
+func Find(email, password string) *User {
+	for _, user := range userList{
+		if user.Email == email && user.Password == password {
+			return &user
+		}
+	}
+	return nil
+}
