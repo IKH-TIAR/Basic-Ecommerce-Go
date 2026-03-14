@@ -28,4 +28,9 @@ func SetupRoutes(mux *http.ServeMux, manager *middleware.Manager) {
 	mux.Handle("DELETE /products/{id}", manager.Chain(
 		http.HandlerFunc(handlers.DeleteProduct),
 	)) // Route to delete product by ID
+
+
+	mux.Handle("POST /users", manager.Chain(
+		http.HandlerFunc(handlers.CreateUser),
+	))
 }
