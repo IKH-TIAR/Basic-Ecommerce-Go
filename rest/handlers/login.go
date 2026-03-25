@@ -1,14 +1,15 @@
 package handlers
 
 import (
+	"ecommerce/config"
 	"ecommerce/database"
 	"ecommerce/utils"
 	"encoding/json"
 	"net/http"
 )
 
-type ReqUsr struct{
-	Email string `json:"email"`
+type ReqUsr struct {
+	Email    string `json:"email"`
 	Password string `json:"password"`
 }
 
@@ -26,8 +27,16 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		utils.WriteError(w, http.StatusBadRequest, "Invalid User")
 		return
 	}
+	cnf := config.GetConfig()
 
-	utils.WriteJSON(w, http.StatusOK, usr)
+	AccessToken := utils.CreateJWT(cnf.Secret, utils.Payload{
+		Sub:         usr.ID,
+		FirstName:   usr.FirstName,
+		LastName:    usr.LastName,
+		Email:       usr.Email,
+		IsShopOwner: usr.IsShopOwner,
+	})
 
+	utils.WriteJSON(w, http.StatusOK, AccessToken)
 
 }

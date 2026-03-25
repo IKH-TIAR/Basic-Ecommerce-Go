@@ -1,10 +1,10 @@
 package handlers
 
 import (
-	"encoding/json"
-	"net/http"
 	"ecommerce/database"
 	"ecommerce/utils"
+	"encoding/json"
+	"net/http"
 )
 
 func CreateProduct(w http.ResponseWriter, r *http.Request) {

@@ -11,6 +11,7 @@ type Config struct {
 	Version     string
 	ServiceName string
 	HttpPort    string
+	Secret      string
 }
 
 var config Config
@@ -41,10 +42,17 @@ func load() {
 		os.Exit(1)
 	}
 
+	secret := os.Getenv("SECRET")
+	if secret == ""{
+		fmt.Println("No Secret")
+		os.Exit(1)
+	}
+
 	config = Config{
 		Version:     version,
 		ServiceName: serviceName,
 		HttpPort:    httpPort,
+		Secret: secret,
 	}
 }
 

@@ -9,7 +9,7 @@ import (
 
 func StartServer(cnf config.Config) {
 
-		manager := middleware.NewManager()
+	manager := middleware.NewManager()
 
 	manager.Use(
 		middleware.Logger,

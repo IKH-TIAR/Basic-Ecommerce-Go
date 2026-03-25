@@ -15,6 +15,7 @@ func SetupRoutes(mux *http.ServeMux, manager *middleware.Manager) {
 
 	mux.Handle("POST /products", manager.Chain(
 		http.HandlerFunc(handlers.CreateProduct),
+		middleware.AuthenticateJWT,
 	)) // Route to create products
 
 	mux.Handle("GET /products/{id}", manager.Chain(
@@ -23,10 +24,12 @@ func SetupRoutes(mux *http.ServeMux, manager *middleware.Manager) {
 
 	mux.Handle("PUT /products/{id}", manager.Chain(
 		http.HandlerFunc(handlers.Update),
+		middleware.AuthenticateJWT,
 	)) // Route to update a product by ID
 
 	mux.Handle("DELETE /products/{id}", manager.Chain(
 		http.HandlerFunc(handlers.DeleteProduct),
+		middleware.AuthenticateJWT,
 	)) // Route to delete product by ID
 
 	mux.Handle("POST /users", manager.Chain(
