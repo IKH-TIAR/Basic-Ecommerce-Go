@@ -2,12 +2,26 @@ package rest
 
 import (
 	"ecommerce/config"
+	"ecommerce/rest/handlers/product"
+	"ecommerce/rest/handlers/user"
 	"ecommerce/rest/middleware"
 	"log"
 	"net/http"
 )
 
-func StartServer(cnf config.Config) {
+type Server struct {
+	productHandler *product.Handler
+	userHandler *user.Handler
+}
+
+func NewServer(productHandler *product.Handler, userHandler *user.Handler) *Server {
+	return &Server{
+		productHandler: productHandler,
+		userHandler: userHandler,
+	}
+}
+
+func (s *Server) StartServer(cnf config.Config) {
 
 	manager := middleware.NewManager()
 
@@ -20,7 +34,9 @@ func StartServer(cnf config.Config) {
 
 	wrappedMux := manager.WrappedMux(mux)
 
-	SetupRoutes(mux, manager)
+	// SetupRoutes(mux, manager)
+	s.productHandler.RegisterRoutes(mux, manager)
+	s.userHandler.RegisterRoutes(mux, manager)
 
 	adr := ":" + cnf.HttpPort
 

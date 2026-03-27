@@ -1,4 +1,4 @@
-package handlers
+package product
 
 import (
 	"net/http"
@@ -6,7 +6,7 @@ import (
 	"ecommerce/utils"
 )
 
-func GetProductsHandler(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) GetProductsHandler(w http.ResponseWriter, r *http.Request) {
 	
 	utils.WriteJSON(w, http.StatusOK, database.List())
 }
