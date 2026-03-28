@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login | Fresh Market</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #f4efe6;
+      --card: #fffaf3;
+      --line: #e6d9c6;
+      --ink: #24180e;
+      --muted: #7c6d5d;
+      --accent: #2f8a5d;
+      --danger: #b63f2c;
+    }
+
+    body {
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 20px;
+      font-family: 'DM Sans', sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 88% 4%, #f6d8cb 0%, rgba(246,216,203,0) 35%),
+        radial-gradient(circle at 5% 84%, #e0f0de 0%, rgba(224,240,222,0) 40%),
+        var(--bg);
+    }
+
+    .card {
+      width: min(470px, 100%);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 28px;
+      background: var(--card);
+      box-shadow: 0 20px 54px rgba(36,24,14,0.12);
+    }
+
+    .tag {
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--muted);
+      font-size: 0.74rem;
+      margin-bottom: 6px;
+    }
+
+    h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.8rem, 5vw, 2.5rem);
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+
+    .sub {
+      color: var(--muted);
+      font-size: 0.9rem;
+      margin-bottom: 18px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+
+    .field label {
+      font-size: 0.77rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+    }
+
+    .field input {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #fff;
+      color: var(--ink);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.95rem;
+      padding: 10px 12px;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .field input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(47, 138, 93, 0.13);
+    }
+
+    .error {
+      display: none;
+      background: #feece8;
+      border: 1px solid #f4c2b8;
+      color: #982b1d;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      padding: 9px 10px;
+      margin-bottom: 10px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 6px;
+    }
+
+    button,
+    .link-btn {
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 700;
+      font-size: 0.9rem;
+      text-decoration: none;
+      padding: 11px 14px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s, transform 0.14s;
+    }
+
+    button { background: var(--accent); color: #fff; flex: 1; }
+    button:hover { background: #256f4b; }
+    button:disabled { background: #9cb9a9; cursor: not-allowed; }
+
+    .link-btn { background: #efe3d2; color: var(--ink); }
+    .link-btn:hover { background: #e4d3bc; }
+
+    .tip {
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: 0.82rem;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 24px;
+      transform: translate(-50%, 16px);
+      background: var(--ink);
+      color: #fff;
+      border-radius: 999px;
+      padding: 10px 14px;
+      font-size: 0.84rem;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.22s, transform 0.22s;
+    }
+
+    .toast.show { opacity: 1; transform: translate(-50%, 0); }
+    .toast.bad { background: var(--danger); }
+    .toast.ok { background: var(--accent); }
+  </style>
+</head>
+<body>
+  <section class="card">
+    <p class="tag">Welcome Back</p>
+    <h1>Login</h1>
+    <p class="sub">Calls POST /users/login and stores your JWT in local storage for protected product APIs.</p>
+
+    <div class="field">
+      <label for="email">Email</label>
+      <input id="email" type="email" autocomplete="email" placeholder="john@example.com" />
+    </div>
+
+    <div class="field">
+      <label for="password">Password</label>
+      <input id="password" type="password" autocomplete="current-password" placeholder="********" />
+    </div>
+
+    <div id="error" class="error"></div>
+
+    <div class="actions">
+      <button id="submit" onclick="login()">Login</button>
+      <a class="link-btn" href="signup.html">Create Account</a>
+      <a class="link-btn" href="index.html">Back to Market</a>
+    </div>
+
+    <p class="tip">Payload keys: email, password</p>
+  </section>
+
+  <div id="toast" class="toast"></div>
+
+  <script>
+    const API_BASE = 'http://localhost:9090';
+    const TOKEN_KEY = 'access_token';
+
+    function showToast(message, type = 'ok') {
+      const el = document.getElementById('toast');
+      el.textContent = message;
+      el.className = `toast ${type} show`;
+      setTimeout(() => el.classList.remove('show'), 2500);
+    }
+
+    function showError(message) {
+      const el = document.getElementById('error');
+      el.textContent = message;
+      el.style.display = 'block';
+    }
+
+    function clearError() {
+      const el = document.getElementById('error');
+      el.style.display = 'none';
+      el.textContent = '';
+    }
+
+    async function login() {
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value.trim();
+      const submit = document.getElementById('submit');
+
+      if (!email || !password) {
+        showError('Please enter email and password.');
+        return;
+      }
+
+      clearError();
+      submit.disabled = true;
+      submit.textContent = 'Logging in...';
+
+      try {
+        const response = await fetch(`${API_BASE}/users/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+
+        if (!response.ok) {
+          throw new Error(`Server responded with ${response.status} ${response.statusText}`);
+        }
+
+        const token = await response.json();
+        if (!token || typeof token !== 'string') {
+          throw new Error('Login response did not return a valid token.');
+        }
+
+        localStorage.setItem(TOKEN_KEY, token);
+        showToast('Login successful.', 'ok');
+
+        setTimeout(() => {
+          window.location.href = 'index.html';
+        }, 800);
+      } catch (error) {
+        showError(error.message || 'Login failed.');
+        showToast('Login failed.', 'bad');
+      } finally {
+        submit.disabled = false;
+        submit.textContent = 'Login';
+      }
+    }
+  </script>
+</body>
+</html>

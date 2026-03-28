@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Signup | Fresh Market</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #f7efe3;
+      --card: #fffaf2;
+      --line: #e9dbc6;
+      --ink: #24180e;
+      --muted: #7e6f5f;
+      --accent: #db5e27;
+      --ok: #2f8a5d;
+      --bad: #b63f2c;
+    }
+
+    body {
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 20px;
+      font-family: 'DM Sans', sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 8% 6%, #f6d8cb 0%, rgba(246,216,203,0) 34%),
+        radial-gradient(circle at 90% 84%, #fde2be 0%, rgba(253,226,190,0) 38%),
+        var(--bg);
+    }
+
+    .card {
+      width: min(520px, 100%);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 28px;
+      background: var(--card);
+      box-shadow: 0 20px 54px rgba(36,24,14,0.12);
+    }
+
+    .tag {
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--muted);
+      font-size: 0.74rem;
+      margin-bottom: 6px;
+    }
+
+    h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.8rem, 5vw, 2.5rem);
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+
+    .sub {
+      color: var(--muted);
+      font-size: 0.9rem;
+      margin-bottom: 18px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+
+    .field.full { grid-column: 1 / -1; }
+
+    .field label {
+      font-size: 0.77rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+    }
+
+    .field input,
+    .field select {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #fff;
+      color: var(--ink);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.95rem;
+      padding: 10px 12px;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .field input:focus,
+    .field select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(219, 94, 39, 0.13);
+    }
+
+    .error {
+      display: none;
+      background: #feece8;
+      border: 1px solid #f4c2b8;
+      color: #982b1d;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      padding: 9px 10px;
+      margin-bottom: 10px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 4px;
+    }
+
+    button,
+    .link-btn {
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 700;
+      font-size: 0.9rem;
+      text-decoration: none;
+      padding: 11px 14px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s, transform 0.14s;
+    }
+
+    button { background: var(--accent); color: #fff; flex: 1; }
+    button:hover { background: #b84d1f; }
+    button:disabled { background: #c7b2a1; cursor: not-allowed; }
+
+    .link-btn { background: #efe3d2; color: var(--ink); }
+    .link-btn:hover { background: #e4d3bc; }
+
+    .tip {
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: 0.82rem;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 24px;
+      transform: translate(-50%, 16px);
+      background: var(--ink);
+      color: #fff;
+      border-radius: 999px;
+      padding: 10px 14px;
+      font-size: 0.84rem;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.22s, transform 0.22s;
+    }
+
+    .toast.show { opacity: 1; transform: translate(-50%, 0); }
+    .toast.ok { background: var(--ok); }
+    .toast.bad { background: var(--bad); }
+
+    @media (max-width: 560px) {
+      .grid { grid-template-columns: 1fr; }
+      button, .link-btn { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <section class="card">
+    <p class="tag">Account Setup</p>
+    <h1>Create User</h1>
+    <p class="sub">Calls POST /users. After signup, use login to get JWT for product update and delete APIs.</p>
+
+    <div class="grid">
+      <div class="field">
+        <label for="first-name">First Name</label>
+        <input id="first-name" type="text" autocomplete="given-name" placeholder="John" />
+      </div>
+
+      <div class="field">
+        <label for="last-name">Last Name</label>
+        <input id="last-name" type="text" autocomplete="family-name" placeholder="Doe" />
+      </div>
+
+      <div class="field full">
+        <label for="email">Email</label>
+        <input id="email" type="email" autocomplete="email" placeholder="john@example.com" />
+      </div>
+
+      <div class="field">
+        <label for="password">Password</label>
+        <input id="password" type="password" autocomplete="new-password" placeholder="********" />
+      </div>
+
+      <div class="field">
+        <label for="owner">Shop Owner</label>
+        <select id="owner">
+          <option value="false">No</option>
+          <option value="true">Yes</option>
+        </select>
+      </div>
+    </div>
+
+    <div id="error" class="error"></div>
+
+    <div class="actions">
+      <button id="submit" onclick="signup()">Create User</button>
+      <a class="link-btn" href="login.html">Go to Login</a>
+      <a class="link-btn" href="index.html">Back to Market</a>
+    </div>
+
+    <p class="tip">Payload keys: first_name, last_name, email, password, is_shop_owner</p>
+  </section>
+
+  <div id="toast" class="toast"></div>
+
+  <script>
+    const API_BASE = 'http://localhost:9090';
+
+    function showToast(message, type = 'ok') {
+      const el = document.getElementById('toast');
+      el.textContent = message;
+      el.className = `toast ${type} show`;
+      setTimeout(() => el.classList.remove('show'), 2600);
+    }
+
+    function showError(message) {
+      const el = document.getElementById('error');
+      el.textContent = message;
+      el.style.display = 'block';
+    }
+
+    function clearError() {
+      const el = document.getElementById('error');
+      el.style.display = 'none';
+      el.textContent = '';
+    }
+
+    async function signup() {
+      const firstName = document.getElementById('first-name').value.trim();
+      const lastName = document.getElementById('last-name').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value.trim();
+      const isShopOwner = document.getElementById('owner').value === 'true';
+      const submit = document.getElementById('submit');
+
+      if (!firstName || !lastName || !email || !password) {
+        showError('Please fill all fields.');
+        return;
+      }
+
+      clearError();
+      submit.disabled = true;
+      submit.textContent = 'Creating...';
+
+      try {
+        const response = await fetch(`${API_BASE}/users`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            first_name: firstName,
+            last_name: lastName,
+            email,
+            password,
+            is_shop_owner: isShopOwner
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error(`Server responded with ${response.status} ${response.statusText}`);
+        }
+
+        showToast('Signup success. Continue to login.', 'ok');
+        setTimeout(() => {
+          window.location.href = 'login.html';
+        }, 900);
+      } catch (error) {
+        showError(error.message || 'Signup failed.');
+        showToast('Signup failed.', 'bad');
+      } finally {
+        submit.disabled = false;
+        submit.textContent = 'Create User';
+      }
+    }
+  </script>
+</body>
+</html>
