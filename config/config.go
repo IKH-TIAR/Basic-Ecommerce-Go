@@ -14,7 +14,7 @@ type Config struct {
 	Secret      string
 }
 
-var config Config
+var config *Config
 
 func load() {
 	err := godotenv.Load()
@@ -48,7 +48,7 @@ func load() {
 		os.Exit(1)
 	}
 
-	config = Config{
+	config = &Config{
 		Version:     version,
 		ServiceName: serviceName,
 		HttpPort:    httpPort,
@@ -56,7 +56,9 @@ func load() {
 	}
 }
 
-func GetConfig() Config {
-	load()
+func GetConfig() *Config {
+	if config == nil {
+		load()
+	}
 	return config
 }

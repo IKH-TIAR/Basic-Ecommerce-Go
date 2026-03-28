@@ -10,18 +10,23 @@ import (
 )
 
 type Server struct {
+	cnf *config.Config
 	productHandler *product.Handler
 	userHandler *user.Handler
 }
 
-func NewServer(productHandler *product.Handler, userHandler *user.Handler) *Server {
+func NewServer(productHandler *product.Handler, 
+	userHandler *user.Handler,
+	cnf *config.Config,
+	) *Server {
 	return &Server{
+		cnf: cnf,
 		productHandler: productHandler,
 		userHandler: userHandler,
 	}
 }
 
-func (s *Server) StartServer(cnf config.Config) {
+func (s *Server) StartServer() {
 
 	manager := middleware.NewManager()
 
@@ -38,9 +43,9 @@ func (s *Server) StartServer(cnf config.Config) {
 	s.productHandler.RegisterRoutes(mux, manager)
 	s.userHandler.RegisterRoutes(mux, manager)
 
-	adr := ":" + cnf.HttpPort
+	adr := ":" + s.cnf.HttpPort
 
-	log.Println("Starting server on :9090")
+	log.Println("Starting server on " + adr)
 
 	log.Fatal(http.ListenAndServe(adr, wrappedMux))
 }
