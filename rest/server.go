@@ -15,7 +15,8 @@ type Server struct {
 	userHandler *user.Handler
 }
 
-func NewServer(productHandler *product.Handler, 
+func NewServer(
+	productHandler *product.Handler, 
 	userHandler *user.Handler,
 	cnf *config.Config,
 	) *Server {

@@ -1,7 +1,7 @@
 package product
 
 import (
-	"ecommerce/database"
+	"ecommerce/repo"
 	"ecommerce/utils"
 	"encoding/json"
 	"net/http"
@@ -18,7 +18,7 @@ func (h *Handler) Update(w http.ResponseWriter, r *http.Request){
 		return
 	}
 
-	var newProduct database.Product
+	var newProduct repo.Product
 
 	if err := json.NewDecoder(r.Body).Decode(&newProduct); err != nil {
 		utils.WriteError(w, http.StatusInternalServerError, err.Error())
@@ -27,7 +27,11 @@ func (h *Handler) Update(w http.ResponseWriter, r *http.Request){
 
 	newProduct.ID = pID
 
-	database.Update(newProduct)
+	prd, err1 := h.productRepo.Update(newProduct)
+	if err1 != nil {
+		utils.WriteError(w, http.StatusInternalServerError, "Failed to update product")
+		return
+	}
 
-	utils.WriteJSON(w, http.StatusOK, "Product Updated")
+	utils.WriteJSON(w, http.StatusOK, prd)
 } 

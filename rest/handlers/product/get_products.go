@@ -2,11 +2,14 @@ package product
 
 import (
 	"net/http"
-	"ecommerce/database"
 	"ecommerce/utils"
 )
 
 func (h *Handler) GetProductsHandler(w http.ResponseWriter, r *http.Request) {
-	
-	utils.WriteJSON(w, http.StatusOK, database.List())
+	products, err := h.productRepo.List()
+	if err != nil {
+		utils.WriteError(w, http.StatusInternalServerError, "Failed to get products")
+		return
+	}
+	utils.WriteJSON(w, http.StatusOK, products)
 }

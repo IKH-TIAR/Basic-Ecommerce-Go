@@ -1,8 +1,16 @@
 package user
 
+import (
+	"ecommerce/repo"
+)
 
-type Handler struct {}
 
-func NewHandler() *Handler {
-	return &Handler{}
+type Handler struct {
+	userRepo repo.UserRepo
+}
+
+func NewHandler(userRepo repo.UserRepo) *Handler {
+	return &Handler{
+		userRepo: userRepo,
+	}
 }

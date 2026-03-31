@@ -1,7 +1,7 @@
 package product
 
 import (
-	"ecommerce/database"
+	"ecommerce/repo"
 	"ecommerce/utils"
 	"encoding/json"
 	"net/http"
@@ -9,7 +9,7 @@ import (
 
 func (h *Handler) CreateProduct(w http.ResponseWriter, r *http.Request) {
 
-	var newProduct database.Product
+	var newProduct repo.Product
 
 	decoder := json.NewDecoder(r.Body)
 
@@ -18,13 +18,17 @@ func (h *Handler) CreateProduct(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// validate
-	if err := newProduct.Validate(); err != nil {
-		utils.WriteError(w, http.StatusBadRequest, err.Error())
+	// // validate
+	// if err := newProduct.Validate(); err != nil {
+	// 	utils.WriteError(w, http.StatusBadRequest, err.Error())
+	// 	return
+	// }
+
+	createdProduct, err := h.productRepo.Create(newProduct)
+	if err != nil {
+		utils.WriteError(w, http.StatusInternalServerError, "Failed to create product")
 		return
 	}
-
-	createdProduct := database.Store(newProduct)
 
 	utils.WriteJSON(w, http.StatusCreated, createdProduct)
 

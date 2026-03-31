@@ -1,7 +1,6 @@
 package product
 
 import (
-	"ecommerce/database"
 	"ecommerce/utils"
 	"net/http"
 	"strconv"
@@ -18,14 +17,18 @@ func (h *Handler) DeleteProduct(w http.ResponseWriter, r *http.Request){
 		return
 	}
 
-	res := database.Delete(pID)
-
-	if res == "deleted"{
-		utils.WriteJSON(w, http.StatusOK, "Product Deleted")
+	res, err1 := h.productRepo.Delete(pID)
+	if err1 != nil {
+		utils.WriteError(w, http.StatusInternalServerError, "Failed to delete product")
 		return
 	}
 
-	utils.WriteError(w, http.StatusNotFound, "Product Not Found")
+	if res == "Deleted" {
+		utils.WriteJSON(w, http.StatusOK, "Product Deleted")
+		return
+	}else {
+		utils.WriteError(w, http.StatusNotFound, "Product Not Found")
+	}
 
-
+	
 }
