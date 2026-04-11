@@ -18,7 +18,7 @@ func Serve() {
 		panic("Failed to connect to the database: " + err.Error())
 	}
 
-	productRepo := repo.NewProductRepo()
+	productRepo := repo.NewProductRepo(dbConn)
 	userRepo := repo.NewUserRepo(dbConn)
 
 	middlewares := middleware.NewMiddleware(cnf)

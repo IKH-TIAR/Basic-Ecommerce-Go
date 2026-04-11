@@ -1,12 +1,19 @@
 package repo
 
-import "slices"
+import (
+	"log"
+	"time"
+
+	"github.com/jmoiron/sqlx"
+)
 
 type Product struct {
-	ID          int     `json:"id"`
-	Title       string  `json:"title"`
-	Description string  `json:"description"`
-	Price       float64 `json:"price"`
+	ID          int     `json:"id" db:"id"`
+	Title       string  `json:"title" db:"title"`
+	Description string  `json:"description" db:"description"`
+	Price       float64 `json:"price" db:"price"`
+	CreatedAt   time.Time `json:"created_at" db:"created_at"`
+	UpdatedAt	time.Time `json:"updated_at" db:"updated_at"`  
 }
 
 type ProductRepo interface {
@@ -14,85 +21,108 @@ type ProductRepo interface {
 	Get(id int) (*Product, error)
 	List() ([]*Product, error)
 	Update(p Product) (*Product, error)
-	Delete(id int) (string, error)
+	Delete(id int)  error
 }
 
 type productRepo struct {
-	productList []*Product
+	dbConn *sqlx.DB
 }
 
-func NewProductRepo() ProductRepo {
-	repo := &productRepo{}
-	generateIntialProduct(repo)
-	return repo
+func NewProductRepo(dbConn *sqlx.DB) ProductRepo {
+	return &productRepo{
+		dbConn: dbConn,
+	}
 }
 
 func (r *productRepo) Create(p Product) (*Product, error) {
-	p.ID = len(r.productList) + 1
-	r.productList = append(r.productList, &p)
+	query := `
+	insert into products (
+	title,
+	description,
+	price
+	) values (
+	$1,
+	$2,
+	$3
+	) 
+	returning id
+	`
+	err := r.dbConn.QueryRow(query, p.Title, p.Description, p.Price).Scan(&p.ID)
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
 	return &p, nil
 }
 
 func (r *productRepo) Get(id int) (*Product, error) {
+	query := `
+	select id, title, description, price
+	from products where id = $1
+	`
+	var product Product
+	err := r.dbConn.Get(&product, query, id)
 
-	for _, product := range r.productList {
-		if product.ID == id {
-			return product, nil
-		}
+	if err != nil {
+		log.Println(err)
+		return nil, err
 	}
-	return nil, nil
+
+	return &product, nil
 
 }
 
 func (r *productRepo) List() ([]*Product, error) {
-	return r.productList, nil
+	query := `
+	select * from products
+	`
+	var products []*Product
+	err := r.dbConn.Select(&products, query)
+
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+
+	return products, nil
 
 }
 
 func (r *productRepo) Update(p Product) (*Product, error) {
-	for idx, product := range r.productList {
-		if p.ID == product.ID {
-			r.productList[idx] = &p
-		}
+
+	query := `
+	update products set
+	title = $1,
+	description = $2,
+	price = $3
+	where id = $4
+	`
+
+	row := r.dbConn.QueryRow(query, p.Title, p.Description, p.Price, p.ID)
+
+	err := row.Err()
+
+	if err != nil {
+		log.Println(err)
+		return nil, err
 	}
+
 	return &p, nil
+
+
 }
 
-func (r *productRepo) Delete(id int) (string, error) {
-	for idx, product := range r.productList {
-		if id == product.ID {
-			r.productList = slices.Delete(r.productList, idx, idx+1)
-			return "Deleted", nil
-		}
-	}
-	return "", nil
-}
+func (r *productRepo) Delete(id int)  error {
+	query := `
+	delete from products where id = $1
+	`
 
-func generateIntialProduct(r *productRepo) {
-	prd1 := &Product{
-		ID:          1,
-		Title:       "Mango",
-		Description: "This is a mango, we like to eat mango",
-		Price:       45.44,
-	}
-	prd2 := &Product{
-		ID:          2,
-		Title:       "orange",
-		Description: "This is a orange, we like to eat orange",
-		Price:       45.44,
+	_, err := r.dbConn.Exec(query, id)
+
+	if err != nil {
+		return err
 	}
 
-	prd3 := &Product{
-		ID:          3,
-		Title:       " banana",
-		Description: "This is a banana, we don't like to eat banana",
-		Price:       45.44,
-	}
-	prd4 := &Product{
-		ID:          4,
-		Title:       "Not banana",
-		Description: "This is a not banana, we don't like to eat not banana",
-		Price:       45.44,
-	}
-	r.productList = append(r.productList, prd1, prd2, prd3, prd4)
+	return nil
+
 }

@@ -12,7 +12,7 @@ func GetConnectionString() string {
 	// user := "postgres"
 	// password := "password"
 	// dbname := "ecommerce"
-	return "host=localhost port=5432 user=postgres password=dipto811 dbname=ecommerce sslmode=disable"
+	return "host=localhost port=5433 user=go_user password=12345 dbname=ecommerce sslmode=disable"
 }
 
 func NewConnection() (*sqlx.DB, error) {
