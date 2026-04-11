@@ -7,9 +7,19 @@ import (
 	"github.com/joho/godotenv"
 )
 
+type DatabaseConfig struct {
+	Host     string
+	Port     string
+	User     string
+	Password string
+	Name     string
+	SSLMode  string
+}
+
 type Config struct {
 	Version     string
 	ServiceName string
+	Database    DatabaseConfig
 	HttpPort    string
 	Secret      string
 }
@@ -43,16 +53,54 @@ func load() {
 	}
 
 	secret := os.Getenv("SECRET")
-	if secret == ""{
+	if secret == "" {
 		fmt.Println("No Secret")
 		os.Exit(1)
+	}
+	dbHost := os.Getenv("DB_HOST")
+	if dbHost == "" {
+		fmt.Println("DB Host is required")
+		os.Exit(1)
+	}
+	dbPort := os.Getenv("DB_PORT")
+	if dbPort == "" {
+		fmt.Println("DB Port is required")
+		os.Exit(1)
+	}
+
+	dbUser := os.Getenv("DB_USER")
+	if dbUser == "" {
+		fmt.Println("DB User is required")
+		os.Exit(1)
+	}
+	dbPassword := os.Getenv("DB_PASSWORD")
+	if dbPassword == "" {
+		fmt.Println("DB Password is required")
+		os.Exit(1)
+	}
+	dbName := os.Getenv("DB_NAME")
+	if dbName == "" {
+		fmt.Println("DB Name is required")
+		os.Exit(1)
+	}
+	dbSSLMode := os.Getenv("DB_SSL_MODE")
+	if dbSSLMode == "" {
+		dbSSLMode = "disable"
 	}
 
 	config = &Config{
 		Version:     version,
 		ServiceName: serviceName,
 		HttpPort:    httpPort,
-		Secret: secret,
+		Secret:      secret,
+		Database: DatabaseConfig{
+			Host:     dbHost,
+			Port:     dbPort,
+			User:     dbUser,
+			Password: dbPassword,
+			Name:     dbName,
+			SSLMode:  dbSSLMode,
+		},
 	}
 }
 

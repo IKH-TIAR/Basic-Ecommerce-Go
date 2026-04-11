@@ -13,7 +13,7 @@ import (
 func Serve() {
 	cnf := config.GetConfig()
 
-	dbConn, err := db.NewConnection()
+	dbConn, err := db.NewConnection(cnf.Database)
 	if err != nil {
 		panic("Failed to connect to the database: " + err.Error())
 	}
