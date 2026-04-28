@@ -1,14 +1,14 @@
 package product
 
 import (
-	"ecommerce/repo"
+	"ecommerce/domain"
 	"ecommerce/utils"
 	"encoding/json"
 	"net/http"
 	"strconv"
 )
 
-func (h *Handler) Update(w http.ResponseWriter, r *http.Request){
+func (h *Handler) Update(w http.ResponseWriter, r *http.Request) {
 	productID := r.PathValue("id")
 
 	pID, err := strconv.Atoi(productID)
@@ -18,7 +18,7 @@ func (h *Handler) Update(w http.ResponseWriter, r *http.Request){
 		return
 	}
 
-	var newProduct repo.Product
+	var newProduct domain.Product
 
 	if err := json.NewDecoder(r.Body).Decode(&newProduct); err != nil {
 		utils.WriteError(w, http.StatusInternalServerError, err.Error())
@@ -27,11 +27,11 @@ func (h *Handler) Update(w http.ResponseWriter, r *http.Request){
 
 	newProduct.ID = pID
 
-	prd, err1 := h.productRepo.Update(newProduct)
+	prd, err1 := h.svc.Update(newProduct)
 	if err1 != nil {
 		utils.WriteError(w, http.StatusInternalServerError, "Failed to update product")
 		return
 	}
 
 	utils.WriteJSON(w, http.StatusOK, prd)
-} 
+}

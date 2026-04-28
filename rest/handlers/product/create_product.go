@@ -1,7 +1,7 @@
 package product
 
 import (
-	"ecommerce/repo"
+	"ecommerce/domain"
 	"ecommerce/utils"
 	"encoding/json"
 	"net/http"
@@ -9,7 +9,7 @@ import (
 
 func (h *Handler) CreateProduct(w http.ResponseWriter, r *http.Request) {
 
-	var newProduct repo.Product
+	var newProduct domain.Product
 
 	decoder := json.NewDecoder(r.Body)
 
@@ -24,7 +24,7 @@ func (h *Handler) CreateProduct(w http.ResponseWriter, r *http.Request) {
 	// 	return
 	// }
 
-	createdProduct, err := h.productRepo.Create(newProduct)
+	createdProduct, err := h.svc.Create(newProduct)
 	if err != nil {
 		utils.WriteError(w, http.StatusInternalServerError, "Failed to create product")
 		return

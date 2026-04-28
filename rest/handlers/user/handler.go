@@ -1,11 +1,15 @@
 package user
 
+import (
+	userDomain "ecommerce/user"
+)
+
 
 type Handler struct {
-	svc UserService
+	svc userDomain.UserService
 }
 
-func NewHandler(svc UserService) *Handler {
+func NewHandler(svc userDomain.UserService) *Handler {
 	return &Handler{
 		svc: svc,
 	}

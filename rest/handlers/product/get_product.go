@@ -17,7 +17,7 @@ func (h *Handler) GetProduct(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	product,err2 := h.productRepo.Get(pID)
+	product,err2 := h.svc.Get(pID)
 	if err2 != nil {
 		utils.WriteError(w, http.StatusInternalServerError, "Failed to get product")
 		return

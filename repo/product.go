@@ -1,27 +1,15 @@
 package repo
 
 import (
+	"ecommerce/domain"
+	"ecommerce/product"
 	"log"
-	"time"
 
 	"github.com/jmoiron/sqlx"
 )
 
-type Product struct {
-	ID          int     `json:"id" db:"id"`
-	Title       string  `json:"title" db:"title"`
-	Description string  `json:"description" db:"description"`
-	Price       float64 `json:"price" db:"price"`
-	CreatedAt   time.Time `json:"created_at" db:"created_at"`
-	UpdatedAt	time.Time `json:"updated_at" db:"updated_at"`  
-}
-
 type ProductRepo interface {
-	Create(p Product) (*Product, error)
-	Get(id int) (*Product, error)
-	List() ([]*Product, error)
-	Update(p Product) (*Product, error)
-	Delete(id int)  error
+	product.ProductRepo
 }
 
 type productRepo struct {
@@ -34,7 +22,7 @@ func NewProductRepo(dbConn *sqlx.DB) ProductRepo {
 	}
 }
 
-func (r *productRepo) Create(p Product) (*Product, error) {
+func (r *productRepo) Create(p domain.Product) (*domain.Product, error) {
 	query := `
 	insert into products (
 	title,
@@ -55,12 +43,12 @@ func (r *productRepo) Create(p Product) (*Product, error) {
 	return &p, nil
 }
 
-func (r *productRepo) Get(id int) (*Product, error) {
+func (r *productRepo) Get(id int) (*domain.Product, error) {
 	query := `
 	select id, title, description, price
 	from products where id = $1
 	`
-	var product Product
+	var product domain.Product
 	err := r.dbConn.Get(&product, query, id)
 
 	if err != nil {
@@ -72,11 +60,11 @@ func (r *productRepo) Get(id int) (*Product, error) {
 
 }
 
-func (r *productRepo) List() ([]*Product, error) {
+func (r *productRepo) List() ([]*domain.Product, error) {
 	query := `
 	select * from products
 	`
-	var products []*Product
+	var products []*domain.Product
 	err := r.dbConn.Select(&products, query)
 
 	if err != nil {
@@ -88,7 +76,7 @@ func (r *productRepo) List() ([]*Product, error) {
 
 }
 
-func (r *productRepo) Update(p Product) (*Product, error) {
+func (r *productRepo) Update(p domain.Product) (*domain.Product, error) {
 
 	query := `
 	update products set
