@@ -14,9 +14,19 @@ func NewUserService(repo UserRepo) UserService {
 
 
 func (svc *userService) Create(user *domain.User) (*domain.User, error) {
-	return svc.repo.Create(user)
+	user, err :=svc.repo.Create(user)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return user, nil
 }
 
 func (svc *userService) Find(email, password string) (*domain.User, error) {
-	return svc.repo.Find(email, password)
+	user, err := svc.repo.Find(email, password)
+	if err != nil {
+		return nil, err
+	}
+	return user, nil
 }
