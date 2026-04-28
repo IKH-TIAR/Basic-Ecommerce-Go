@@ -20,7 +20,7 @@ func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	usr, err1 := h.userRepo.Find(reqUsr.Email, reqUsr.Password)
+	usr, err1 := h.svc.Find(reqUsr.Email, reqUsr.Password)
 
 	if err1 != nil {
 		utils.WriteError(w, http.StatusBadRequest, "Invalid User")

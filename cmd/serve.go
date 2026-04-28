@@ -5,9 +5,10 @@ import (
 	"ecommerce/infra/db"
 	"ecommerce/repo"
 	"ecommerce/rest"
-	"ecommerce/rest/handlers/product"
-	"ecommerce/rest/handlers/user"
+	productHandler "ecommerce/rest/handlers/product"
+	userHandler "ecommerce/rest/handlers/user"
 	"ecommerce/rest/middleware"
+	"ecommerce/user"
 )
 
 func Serve() {
@@ -18,13 +19,17 @@ func Serve() {
 		panic("Failed to connect to the database: " + err.Error())
 	}
 
+	// Initialize repositories
 	productRepo := repo.NewProductRepo(dbConn)
 	userRepo := repo.NewUserRepo(dbConn)
 
+	// Initialize domain
+	userService := user.NewUserService(userRepo)
+
 	middlewares := middleware.NewMiddleware(cnf)
 
-	productHandler := product.NewHandler(middlewares, productRepo)
-	userHandler := user.NewHandler(userRepo)
+	productHandler := productHandler.NewHandler(middlewares, productRepo)
+	userHandler := userHandler.NewHandler(userService)
 
 	server := rest.NewServer(productHandler, userHandler, cnf)
 
