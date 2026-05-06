@@ -30,8 +30,8 @@ func (s *productService) Get(id int) (*domain.Product, error) {
 	return product, nil
 }
 
-func (s *productService) List() ([]*domain.Product, error) {
-	products, err := s.repo.List()
+func (s *productService) List(page, limit int) ([]*domain.Product, error) {
+	products, err := s.repo.List(page, limit)
 	if err != nil {
 		return nil, err
 	}
@@ -52,5 +52,13 @@ func (s *productService) Delete(id int) error {
 		return err
 	}
 	return nil
+}
+
+func (s *productService) Count() (int, error) {
+	count, err := s.repo.Count()
+	if err != nil {
+		return 0, err
+	}
+	return count, nil
 }
 

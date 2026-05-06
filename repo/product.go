@@ -60,12 +60,15 @@ func (r *productRepo) Get(id int) (*domain.Product, error) {
 
 }
 
-func (r *productRepo) List() ([]*domain.Product, error) {
+func (r *productRepo) List(page, limit int) ([]*domain.Product, error) {
+	offset := ((page - 1) * limit) + 1
+	
 	query := `
 	select * from products
+	LIMIT $1 OFFSET $2
 	`
 	var products []*domain.Product
-	err := r.dbConn.Select(&products, query)
+	err := r.dbConn.Select(&products, query, limit, offset)
 
 	if err != nil {
 		log.Println(err)
@@ -112,5 +115,22 @@ func (r *productRepo) Delete(id int)  error {
 	}
 
 	return nil
+
+}
+
+
+func (r *productRepo) Count() (int, error) {
+	query := `
+	select count(*) from products
+	`
+	var count int
+	err := r.dbConn.Get(&count, query)
+
+	if err != nil {
+		log.Println(err)
+		return 0, err
+	}
+
+	return count, nil
 
 }
